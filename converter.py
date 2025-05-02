@@ -45,7 +45,7 @@ def convert(custom):
         dep_sanitized = '{'
         for i in range(len(dep_list)):
             if(i==len(dep_list)-1 and degree_cpy>1):
-                dep_sanitized += '\\partial ' + dep_list[i]+'^'+ str(degree_cpy)
+                dep_sanitized += ' \\partial ' + dep_list[i]+'^'+ str(degree_cpy)
             elif (i==0):
                 dep_sanitized += '\\partial ' + dep_list[i]
             else:
