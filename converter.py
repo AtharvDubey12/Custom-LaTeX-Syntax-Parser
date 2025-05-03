@@ -88,7 +88,8 @@ def diff_handler(custom, iteratorIdx):
     return num_sanitized+dep_sanitized
 
 
-
+def integ_handler(custom, iteratorIdx):
+    return ""
 
 
 
@@ -102,10 +103,13 @@ def convert(custom):
         iteratorIdx+=1
     iteratorIdx+=1
 
-    if(keyword=='Pdiff'):
-        return pdiff_handler(custom, iteratorIdx)
-    elif(keyword=='Diff'):
-        return diff_handler(custom, iteratorIdx)
+    match(keyword):
+        case "Pdiff":
+            return pdiff_handler(custom, iteratorIdx)
+        case "Diff":
+            return diff_handler(custom, iteratorIdx)
+        case "Integ":
+            return integ_handler(custom, iteratorIdx)
             
 
                 
