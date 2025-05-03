@@ -103,7 +103,7 @@ def definteg_handler(custom, iteratorIdx,degree_cpy, func, dep_unsanitized):
             lim_str+= custom[iteratorIdx]
         iteratorIdx += 1
     num_sanitized = ""
-    lims = lim_str.split(',')
+    lims = lim_str.split(',')[::-1]
     for i in range(len(lims)):
         num_sanitized += '\\int_{' + lims[i].split('->')[0] + '}^{' + lims[i].split('->')[1] + '} '
     num_sanitized+= func + ' '
@@ -118,12 +118,18 @@ def definteg_handler(custom, iteratorIdx,degree_cpy, func, dep_unsanitized):
 
 
 def convert(custom):
-    if(not len(custom) or custom[0].upper() != custom[0]):
+    if(not len(custom)):
         return custom
     keyword=""
     iteratorIdx = 0
-    while(custom[iteratorIdx]!='[' and custom[iteratorIdx] != '(' and not custom[iteratorIdx].isdigit()):
-        keyword+= custom[iteratorIdx]
+    capture_flag = False
+    while(iteratorIdx<len(custom)):
+        if(custom[iteratorIdx].isalpha()):
+            capture_flag= True
+        elif(not custom[iteratorIdx].isalpha() and keyword != ""):
+            break
+        if(capture_flag):
+            keyword+= custom[iteratorIdx]
         iteratorIdx+=1
     iteratorIdx+=1
 
