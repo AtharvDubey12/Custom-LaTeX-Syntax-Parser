@@ -2,7 +2,7 @@
 
  ## Partial Differential Parse
 
- syntax : Pdiff[ order ](function)[dependent variable(s)]
+ syntax : Pdiff [order](function)[dependent variable(s)]
  breakdown:
    * Pdiff = keyword
    * order = order of partial differentiation, if no order is given, it is implicitly assumed as 1
