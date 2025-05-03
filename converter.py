@@ -24,7 +24,7 @@ def iteration_core(custom, iteratorIdx):
         degree_cpy = int(degree)
     else:
         degree_cpy = 1
-    
+    func = convert(func)
     return (degree, degree_cpy, func, dep_unsanitized, iteratorIdx)
 
 
@@ -119,10 +119,10 @@ def definteg_handler(custom, iteratorIdx,degree_cpy, func, dep_unsanitized):
 
 def convert(custom):
     if(not len(custom) or custom[0].upper() != custom[0]):
-        return "invalid syntax"
+        return custom
     keyword=""
     iteratorIdx = 0
-    while(custom[iteratorIdx]!='[' and custom[iteratorIdx] != '('):
+    while(custom[iteratorIdx]!='[' and custom[iteratorIdx] != '(' and not custom[iteratorIdx].isdigit()):
         keyword+= custom[iteratorIdx]
         iteratorIdx+=1
     iteratorIdx+=1
@@ -134,7 +134,7 @@ def convert(custom):
             return diff_handler(custom, iteratorIdx)
         case "Integ":
             return integ_handler(custom, iteratorIdx)
-            
+    return custom
 
                 
 
