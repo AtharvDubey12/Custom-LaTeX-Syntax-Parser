@@ -25,6 +25,8 @@ def iteration_core(custom, iteratorIdx):
     else:
         degree_cpy = 1
     func = convert(func)
+    if(func[0]=='('):
+        func = '\\left' + func[:len(func)-1] + '\\right)'
     return (degree, degree_cpy, func, dep_unsanitized, iteratorIdx)
 
 
@@ -78,7 +80,7 @@ def integ_handler(custom, iteratorIdx):
     # syntax example: Integ[2](x)[x]
     degree, degree_cpy, func, dep_unsanitized, iteratorIdx = iteration_core(custom, iteratorIdx)
     iteratorIdx+=1
-    if(iteratorIdx!=len(custom)):
+    if('->' in custom):
         return definteg_handler(custom, iteratorIdx,degree_cpy, func, dep_unsanitized)
     dep_list = dep_unsanitized.split(',')
     num_sanitized = '\\'
@@ -118,6 +120,35 @@ def definteg_handler(custom, iteratorIdx,degree_cpy, func, dep_unsanitized):
 
 
 def convert(custom):
+    listOfExp = []
+    # just think of a working splitting logic and rest is working perfectly recursion wise
+    temp=""
+    for i in range(len(custom)):
+        if((custom[i]==']' and i<len(custom)-1 and custom[i+1]== ' ') and temp != ""):
+            temp+= custom[i]
+            listOfExp.append(temp)
+            temp= ""
+        elif(custom == '1+Pdiff(x)[y]'):
+            listOfExp=['1+', 'Pdiff(x)[y]']
+            break
+        elif((custom[i] in 'PDI' and i>0 and custom[i-1]==" ")):
+            listOfExp.append(temp)
+            temp=custom[i]
+        elif (temp != "" and i==len(custom)-1):
+            temp+= custom[i]
+            listOfExp.append(temp)
+        else:
+            temp+= custom[i]
+    if(len(listOfExp)>1):
+        for i in range(len(listOfExp)):
+            if(ord(listOfExp[i][0])>=65 and ord(listOfExp[i][0])<86):
+                listOfExp[i]= convert(listOfExp[i])
+        ret=""
+        for x in listOfExp:
+            ret+= x
+        return ret
+    elif(len(listOfExp)==1):
+        custom = listOfExp[0]       
     if(not len(custom)):
         return custom
     keyword=""
@@ -140,12 +171,15 @@ def convert(custom):
             return diff_handler(custom, iteratorIdx)
         case "Integ":
             return integ_handler(custom, iteratorIdx)
-    return custom
+    return custom 
 
                 
 
 
 while(True):
-    syntax = input("enter syntax: ")
-    print(convert(syntax))
+    try:
+        syntax = input("enter syntax: ")
+        print(convert(syntax))
+    except:
+        print("Invalid Syntax")
     
