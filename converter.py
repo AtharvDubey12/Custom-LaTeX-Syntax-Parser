@@ -17,9 +17,16 @@ def iteration_core(custom, iteratorIdx):
             func += custom[iteratorIdx]
         iteratorIdx += 1
     iteratorIdx += 1
-    while(custom[iteratorIdx] != ']'):
-        dep_unsanitized+= custom[iteratorIdx]
+    openCount=1
+    while(openCount):
+        if(custom[iteratorIdx]=='['):
+            openCount+=1
+        elif(custom[iteratorIdx]==']'):
+            openCount-=1
+        if(openCount):
+            dep_unsanitized+= custom[iteratorIdx]
         iteratorIdx += 1
+    iteratorIdx-=1
     if(degree != ""):
         degree_cpy = int(degree)
     else:
@@ -43,11 +50,11 @@ def pdiff_handler(custom, iteratorIdx):
     dep_sanitized = '{'
     for i in range(len(dep_list)):
         if(i==len(dep_list)-1 and degree_cpy>1):
-            dep_sanitized += ' \\partial ' + dep_list[i]+'^'+ str(degree_cpy)
+            dep_sanitized += ' \\partial ' + convert(dep_list[i])+'^'+ str(degree_cpy)
         elif (not i):
-            dep_sanitized += '\\partial ' + dep_list[i]
+            dep_sanitized += '\\partial ' + convert(dep_list[i])
         else:
-            dep_sanitized += ' \\partial ' + dep_list[i]
+            dep_sanitized += ' \\partial ' + convert(dep_list[i])
         degree_cpy -= 1
     dep_sanitized += '}'
 
@@ -66,11 +73,11 @@ def diff_handler(custom, iteratorIdx):
     dep_sanitized = '{'
     for i in range(len(dep_list)):
         if(i==len(dep_list)-1 and degree_cpy>1):
-            dep_sanitized += ' d' + dep_list[i]+'^'+ str(degree_cpy)
+            dep_sanitized += ' d' + convert(dep_list[i])+'^'+ str(degree_cpy)
         elif (not i):
-            dep_sanitized += 'd' + dep_list[i]
+            dep_sanitized += 'd' + convert(dep_list[i])
         else:
-            dep_sanitized += ' d' + dep_list[i]
+            dep_sanitized += ' d' + convert(dep_list[i])
         degree_cpy -= 1
     dep_sanitized += '}'
     return num_sanitized+dep_sanitized
@@ -121,7 +128,7 @@ def definteg_handler(custom, iteratorIdx,degree_cpy, func, dep_unsanitized):
 def frac_handler(custom, iteratorIdx):
     _, _, func, dep_unsanitized,_ = iteration_core(custom, iteratorIdx)
     func = convert(func)
-    return '\\frac{' + func + '}{' + dep_unsanitized + '}'
+    return '\\frac{' + func + '}{' + convert(dep_unsanitized) + '}'
 
 
 def convert(custom):
@@ -133,10 +140,7 @@ def convert(custom):
             temp+= custom[i]
             listOfExp.append(temp)
             temp= ""
-        elif(custom == '1+Pdiff(x)[y]'):
-            listOfExp=['1+', 'Pdiff(x)[y]']
-            break
-        elif((custom[i] in 'PDI' and i>0 and custom[i-1]==" ")):
+        elif((custom[i] in 'PDIF' and i>0 and custom[i-1]==" ")):
             listOfExp.append(temp)
             temp=custom[i]
         elif (temp != "" and i==len(custom)-1):
@@ -187,9 +191,5 @@ def convert(custom):
 
 
 while(True):
-    try:
-        syntax = input("enter syntax: ")
-        print(convert(syntax))
-    except:
-        print(syntax)
-    
+    syntax = input("enter syntax: ")
+    print(convert(syntax))
