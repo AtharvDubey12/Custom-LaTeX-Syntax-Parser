@@ -107,7 +107,7 @@ def definteg_handler(custom, iteratorIdx,degree_cpy, func, dep_unsanitized):
     num_sanitized = ""
     lims = lim_str.split(',')[::-1]
     for i in range(len(lims)):
-        num_sanitized += '\\int_{' + limit_santizer(lims[i].split('->')[0]) + '}^{' + limit_santizer(lims[i].split('->')[1]) + '} '
+        num_sanitized += '\\int_{' + convert(lims[i].split('->')[0]) + '}^{' + convert(lims[i].split('->')[1]) + '} '
     num_sanitized+= func + ' '
     for object in dep_list:
         num_sanitized+= '\\, d' + object + ' '
@@ -120,14 +120,9 @@ def definteg_handler(custom, iteratorIdx,degree_cpy, func, dep_unsanitized):
 
 def frac_handler(custom, iteratorIdx):
     _, _, func, dep_unsanitized,_ = iteration_core(custom, iteratorIdx)
-    func = limit_santizer(func)
+    func = convert(func)
     return '\\frac{' + func + '}{' + dep_unsanitized + '}'
 
-def limit_santizer(str_lim):
-    str_lim = convert(str_lim)
-    if(str_lim=='pi'):
-        str_lim = '\\' + str_lim
-    return str_lim
 
 def convert(custom):
     listOfExp = []
@@ -183,6 +178,9 @@ def convert(custom):
             return integ_handler(custom, iteratorIdx)
         case "Frac":
             return frac_handler(custom, iteratorIdx)
+        case "Pi":
+            return '\\pi'
+        
     return custom 
 
                 
