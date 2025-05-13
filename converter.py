@@ -42,8 +42,6 @@ def iteration_core(custom, iteratorIdx):
     else:
         degree_cpy = 1
     func = convert(func)
-    if(func[0]=='('):
-        func = '\\left' + func[:len(func)-1] + '\\right)'
     return (degree, degree_cpy, func, dep_unsanitized, iteratorIdx)
 
 
@@ -274,6 +272,16 @@ def sqrt_handler(custom, iterationIdx):
         output+= '['+degree+']{'+func+'}'
     return output
 
+def parenthesis_scaler(processed):
+    final=""
+    for i in range(len(processed)):
+        if(processed[i]=='('):
+            final+='\\left('
+        elif(processed[i]==')'):
+            final+='\\right)'
+        else:
+            final+= processed[i]
+    return final
 
 
 def convert(custom):
@@ -282,6 +290,9 @@ def convert(custom):
     isInner = False
     openCount=0
     for i in range(len(custom)):
+        if(custom[0]=='('):
+            listOfExp = ['(',convert(custom[1:len(custom)-1]),')']
+            break
         if(custom[i] in '(['):
             openCount+=1
         elif(custom[i] in ')]'):
@@ -293,6 +304,9 @@ def convert(custom):
         if('Piece' in custom):
             listOfExp=[custom]
             break
+        if(custom[i]==' ' and i>0 and custom[i-1]!=" " and not isInner and temp!=""):
+            listOfExp.append(temp)
+            temp=""
         if((custom[i]==']' and i<len(custom)-1 and custom[i+1]== ' ') and temp != "" and not isInner):
             temp+= custom[i]
             listOfExp.append(temp)
@@ -300,11 +314,16 @@ def convert(custom):
         elif((custom[i] in 'PDIFT' and i>0 and custom[i-1]==" " and not isInner)):
             listOfExp.append(temp)
             temp=custom[i]
+        elif(custom[i]=='i' and i>0 and custom[i-1]=='P' and not isInner):
+            temp+= custom[i]
+            listOfExp.append(temp)
+            temp=""
         elif (temp != "" and i==len(custom)-1):
             temp+= custom[i]
             listOfExp.append(temp)
         else:
             temp+= custom[i]
+    print(listOfExp)
     if(len(listOfExp)>1):
         for i in range(len(listOfExp)):
             if(ord(listOfExp[i][0])>=65 and ord(listOfExp[i][0])<86):
@@ -352,8 +371,75 @@ def convert(custom):
         case "Sqrt":
             return sqrt_handler(custom, iteratorIdx)
             
-        
+    if('(' in custom):
+        return test(custom)
+    #following code is for backup
+        before=""
+        after=")"
+        i = 0
+        while(custom[i]!='('):
+            before+=custom[i]
+            i+=1
+        i+=1
+        before+='('
+        openCount=1
+        forced_func=""
+        while(openCount):
+            if(custom[i] in '(['):
+                openCount+=1
+            elif(custom[i] in ')]'):
+                openCount-=1
+            if(openCount):
+                forced_func+= custom[i]
+            i+=1
+        while(i<len(custom)):
+            after+=custom[i]
+            i+=1
+        return before+convert(forced_func)+after
+    #backup ends here
     return custom
 
+def test(custom):
+    temp=""
+    openCount = 0
+    i=0
+    isInner = False
+    listOfExp2=[]
+    while(i<len(custom)):
+        while(not isInner):
+            if(custom[i] in ')]'):
+                openCount-=1
+            elif(custom[i] in '(['):
+                openCount+=1
+            isInner = bool(openCount)
+            temp+= custom[i]
+            i+=1
+        listOfExp2.append(temp)
+        temp=""
+        if(isInner and i>=len(custom)):
+            return custom
+        while(isInner):
+            if(custom[i] in ')]'):
+                openCount-=1
+            elif(custom[i] in '(['):
+                openCount+=1
+            isInner = bool(openCount)
+            if(isInner):
+                temp+= custom[i]
+            i+=1
+        listOfExp2.append(temp)
+        listOfExp2.append(')')
+        temp=""
+        i+=1
+    ans=""
+    for x in listOfExp2:
+        ans+= convert(x)
+
+    return ans
+        
+        
+
+
 while(True):
-    print(convert(input("syntax: ")))
+    syntax = input("Syntax: ")
+    print(parenthesis_scaler(convert(syntax)))
