@@ -2,4 +2,4 @@
 
 
      ## NOTE: Development shifted to C++ based version.
-     This version is still not finished yet and will be worked on but the primary version is now the C++ coounterpart (velveX - cpp).
+     This version is still not finished yet and will not be worked on as the primary version now is its C++ counterpart (velveX - cpp).
